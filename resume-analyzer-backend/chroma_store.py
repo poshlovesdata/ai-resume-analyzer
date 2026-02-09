@@ -1,15 +1,28 @@
 import chromadb
 import json
-from pprint import pprint
+from dotenv import load_dotenv
+import os
 
-chroma_client = chromadb.PersistentClient('./chroma_db')
+load_dotenv()
+
+CHROMA_API_KEY = os.getenv("CHROMA_API_KEY")
+CHROMA_TENANT = os.getenv("CHROMA_TENANT")
+CHROMA_DATABASE = os.getenv("CHROMA_DATABASE")
+
+# chroma_client = chromadb.PersistentClient('./chroma_db')
+
+chroma_client = chromadb.CloudClient(
+  api_key=CHROMA_API_KEY,
+  tenant=CHROMA_TENANT,
+  database=CHROMA_DATABASE
+)
 
 collection = chroma_client.get_or_create_collection(name="resources-base")
 
 def seed_vectordb():
     """Reads resources.json and loads it into Chroma if empty."""
     if collection.count() > 0:
-        print(f"Knocwledge Base loaded. Contains {collection.count()} resources.") 
+        print(f"Knowledge Base already loaded. Contains {collection.count()} resources.") 
         return
     else:
         print("Seeding VectorDB...")
