@@ -1,4 +1,5 @@
 import chromadb
+from chromadb.utils import embedding_functions
 import json
 from dotenv import load_dotenv
 import os
@@ -8,7 +9,12 @@ load_dotenv()
 CHROMA_API_KEY = os.getenv("CHROMA_API_KEY")
 CHROMA_TENANT = os.getenv("CHROMA_TENANT")
 CHROMA_DATABASE = os.getenv("CHROMA_DATABASE")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
+openai_ef = embedding_functions.OpenAIEmbeddingFunction(
+                api_key=OPENAI_API_KEY,
+                model_name="text-embedding-3-small"
+            )
 # chroma_client = chromadb.PersistentClient('./chroma_db')
 
 chroma_client = chromadb.CloudClient(
@@ -17,7 +23,7 @@ chroma_client = chromadb.CloudClient(
   database=CHROMA_DATABASE
 )
 
-collection = chroma_client.get_or_create_collection(name="resources-base")
+collection = chroma_client.get_or_create_collection(name="resources-base", embedding_function=openai_ef)
 
 def seed_vectordb():
     """Reads resources.json and loads it into Chroma if empty."""
