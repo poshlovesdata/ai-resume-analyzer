@@ -62,4 +62,4 @@ chroma_db/
 # Local development
 *.local
 
-resources.json
+# resources.json
