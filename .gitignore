@@ -62,5 +62,4 @@ chroma_db/
 # Local development
 *.local
 
-resume-analyzer-frontend/
 resources.json
