@@ -1,0 +1,17 @@
+# Render Blueprint specification
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: resume-gap-analyzer-api
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn api:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false  # Set manually in Render dashboard
+      - key: POSTGRES_URL
+        sync: false  # Set manually in Render dashboard or use Render PostgreSQL
+      - key: PYTHON_VERSION
+        value: 3.11.0
+    healthCheckPath: /docs
