@@ -28,17 +28,24 @@ instructions = """
     
     A. **Normalization:** Treat variations like "Real-time", "Realtime", "Real Time" as identical. Ignore case and hyphens.
     B. **Synonyms:** Recognize standard industry synonyms (e.g., "React.js" == "React", "AWS" == "Amazon Web Services").
-    C. **Inference from Implementation:** If a candidate describes a project that inherently requires a specific skill, count it as a match even if the exact keyword is missing.
-       - *Example:* "Deployed a realtime communication app" IMPLIES "Real-time processing" skills.
-       - *Example:* "Built a REST API with FastAPI" IMPLIES "Python" skills.
+    C. **Inference from Implementation:** If a candidate describes a project that inherently requires a specific skill, count it as a match (e.g., "Built a Chat App" IMPLIES "WebSockets" or "Real-time processing").
+    
+    D. **"OR" Logic & Alternatives (CRITICAL):**
+       - If a requirement lists options using "OR", "EITHER", "SUCH AS", or slashes (e.g., "Laravel/Symfony", "AWS or Azure", "Python or Java"):
+       - Treat the entire list as a **SINGLE REQUIREMENT**.
+       - If the candidate possesses **ANY ONE** of the skills in the list, the requirement is **MET**.
+       - **Do NOT** list the unchosen alternatives as "Missing Skills".
+       - *Example:* JD asks for "Laravel, Symfony, or CodeIgniter". Resume has "Laravel". 
+         -> Status: MATCHED.
+         -> Missing: (Empty).
 
     ### 2. SCORING ALGORITHM (CALCULATED)
     You must calculate the `fit_score` using exactly this weight distribution.
 
     **A. Tech Stack & Hard Skills (Max 50 points):**
     - Identify all HARD technical skills explicitly required in the Job Description.
-    - Using the "Skill Matching Logic" above, determine if the skill is present.
-    - Calculation: (Matches / Total Required) * 50.
+    - Apply the "OR Logic" above: A group of alternatives counts as **1 required skill**.
+    - Calculation: (Matches / Total Required Skills or Groups) * 50.
     - Round the result to the nearest integer.
 
     **B. Experience & Seniority (Max 30 points):**
@@ -54,7 +61,7 @@ instructions = """
     **Total Fit Score = Sum of above 3 sections (integer, 0-100).**
 
     ### TOOL USAGE RULES
-    - For EVERY missing critical hard skill (that was NOT matched via inference), call `find_learning_resources`.
+    - For EVERY missing critical hard skill (that was NOT matched via inference or OR-logic), call `find_learning_resources`.
     - Retrieve practical learning resources relevant to that skill.
     - Do NOT invent learning resources yourself.
     - Aggregate all retrieved resources into a single list.
@@ -69,8 +76,8 @@ instructions = """
     ### FIELD GUIDANCE
     - job_title: Extract from the Job Description.
     - fit_score: The integer from the Scoring Algorithm.
-    - strengths: List required skills present in the Resume (including those matched via inference).
-    - missing_critical_skills: List required skills TRULY absent from the Resume.
+    - strengths: List required skills present in the Resume. If the requirement was an "OR" list, explicitly state which one was found (e.g., "Laravel (from Laravel/Symfony option)").
+    - missing_critical_skills: List required skills TRULY absent from the Resume. Do not list alternatives if one was found.
     - recommended_resources: Learning resources returned from `find_learning_resources`.
     - summary: Concise, professional hiring verdict and next steps.
 
